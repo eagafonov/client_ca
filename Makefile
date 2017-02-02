@@ -44,4 +44,19 @@ db:
 protect:
 	chmod 600 ca/ClientCA.key ca.cnf
 
+test-client: test.cert
+
+test.key:
+	openssl genrsa -out $@ 2048
+
+test.csr: test.key
+	openssl req -new -key test.key -nodes -subj /CN=test@example.com/emailAddress=test@example.com/ST=test/C=RU/O=test.example.com -out $@
+
+test.cert: test.csr
+	make REQ=test sign
+
+
+backup:
+	tar -cvf client_ca_backup_`date +%s`.tar ca db certs  req
+
 .PHONY: protect
