@@ -5,10 +5,21 @@ all:
 RANDFILE=$(shell pwd)/db/rnd
 export RANDFILE
 
+SETTINGS:=$(shell readlink -e settings.mk)
 
-include settings.mk
+ifeq ("$(SETTINGS)", "")
+check-settings:
+	@echo "Can't find settings.mk. Please copy it from settings.mk.template and update"
+	exit 1
+else
+check-settings:
+	@true
 
-ca: init_ca ca/ClientCA.key ca/ClientCA.pem
+include $(SETTINGS)
+endif
+
+
+ca: check-settings init_ca ca/ClientCA.key ca/ClientCA.pem
 
 init_ca:
 	mkdir -p ca
@@ -23,7 +34,7 @@ ca/ClientCA.pem: ca/ClientCA.key
 dump_ca_cert:
 	openssl x509 -in ca/ClientCA.pem -text -noout
 
-sign: db ca
+sign: ca db
 	openssl ca -batch -config ca.conf -name client_ca -notext -in $(REQ).csr -out $(REQ).cert
 db:
 	mkdir -p db certs
