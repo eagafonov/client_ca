@@ -42,7 +42,7 @@ db:
 	touch db/certindex
 
 protect:
-	chmod 600 ca/ClientCA.key ca.cnf
+	chmod 600 ca/ClientCA.key ca.conf
 
 test-client: test.cert
 
